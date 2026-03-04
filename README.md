@@ -38,7 +38,7 @@
 - [Про configparser](https://docs.python.org/3/library/configparser.html#modul-configparser)
 - [Про pip freeze](https://pip.pypa.io/en/stable/cli/pip_freeze/)
 
-
 #### Подсказки
+
 - при авторизации указать реальные данные пользователя
-- ввести полученный при авторизации код 
+- ввести полученный при авторизации код
