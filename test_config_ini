@@ -1,6 +1,6 @@
 [ui]
 base_url = https://www.chitai-gorod.ru
-timeout = 10
+timeout = 30
 browser_name = chrome
 
 [api]

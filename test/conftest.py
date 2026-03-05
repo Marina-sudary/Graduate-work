@@ -60,4 +60,10 @@ def login_via_cookie(browser, test_data, config):
             browser.refresh()
     yield
     # задержка для визуального контроля
-    time.sleep(test_data.get("wait_after_actions") or 0)
+    # Получаем значение и преобразуем в число
+wait_time = test_data.get("wait_after_actions")
+if wait_time:
+    try:
+        time.sleep(float(wait_time))
+    except (ValueError, TypeError):
+        time.sleep(1)  # значение по умолчанию, если не удалось преобразовать
