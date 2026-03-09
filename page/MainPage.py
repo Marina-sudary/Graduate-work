@@ -7,6 +7,7 @@ from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from configuration.configProvider import configProvider
 
@@ -36,25 +37,30 @@ class MainPage:
         try:
             wait = WebDriverWait(self.__driver, 5)
 
-        # Найти все кнопки "Купить"
+            # Найти все кнопки "Купить"
             btns = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, selector)))
             if not btns:
                 raise Exception("Кнопки 'Купить' не найдены")
 
-        # Прокрутить к первой кнопке
+            # Прокрутить к первой кнопке
             first_btn = btns[0]
             self.__driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", first_btn)
 
-        # После прокрутки снова получить доступ к элементу и дождаться кликабельности
-        # Это помогает избежать ошибок из-за устаревшей ссылки на элемент после прокрутки
+            # После прокрутки снова получить доступ к элементу и дождаться кликабельности
             first_btn = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, selector)))[0]
             wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, selector)))
 
-        # Клик по кнопке
+            # Клик по кнопке
             first_btn.click()
-        except Exception:
-        # Можно добавить логирование или повторную обработку ошибок здесь
-            raise
+            
+        except Exception as e:
+            # Можно добавить логирование или повторную обработку ошибок здесь
+            allure.attach(
+                self.__driver.get_screenshot_as_png(),
+                name="add_to_cart_error",
+                attachment_type=allure.attachment_type.PNG
+            )
+            raise Exception(f"Не удалось добавить товар в корзину: {e}")
 
     @allure.step("Открыть корзину")
     def open_cart(self):
@@ -82,12 +88,8 @@ class MainPage:
             raise Exception("Кнопки 'В закладки' не найдены")
         btns[0].click()
 
-    @allure.step("Войти с использованием cookies (refresh-token и access-token)")
+    @allure.step("Войти с использованием cookies")
     def login_with_cookies(self, refresh_token: str = None, access_token: str = None):
-        """
-        Вызов аналогичен AuthPage.login_with_cookies, tokens можно передавать сюда
-        или через переменные окружения CHITAI_REFRESH_TOKEN и CHITAI_ACCESS_TOKEN.
-        """
         if not refresh_token or not access_token:
             refresh_token = refresh_token or os.environ.get("CHITAI_REFRESH_TOKEN")
             access_token = access_token or os.environ.get("CHITAI_ACCESS_TOKEN")

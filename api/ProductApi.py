@@ -1,89 +1,201 @@
-import json
-from typing import List, Dict, Optional
 import requests
-import os
+import allure
+from typing import List, Dict, Optional, Any
+from urllib.parse import urljoin
+
 
 class ProductApi:
-    def __init__(
-        self,
-        base_url: Optional[str] = None,
-        token: Optional[str] = None,
-        token_type: str = "header"  # "header" или "cookie"
-    ) -> None:
+    """
+    Класс для работы с API Читай-города
+    """
+    
+    def __init__(self, base_url: str, token: str = None):
         """
-        base_url: базовый URL API, например https://www.chitai-gorod.ru/api
-        token: токен авторизации
-        token_type: способ передачи токена: 'header' (Bearer) или 'cookie'
+        Инициализация API клиента
+        
+        Args:
+            base_url: Базовый URL API
+            token: Токен авторизации (если требуется)
         """
-        self.base_url = (base_url or "https://www.chitai-gorod.ru/api").rstrip("/")
+        self.base_url = base_url.rstrip('/')
+        self.token = token
         self.session = requests.Session()
-        if token:
-            if token_type == "header":
-                self.session.headers.update({"Authorization": f"Bearer {token}"})
-            elif token_type == "cookie":
-                # Пример: передать токен как cookie (название зависит от вашего API)
-                self.session.cookies.set("token", token, path="/")
-            else:
-                raise ValueError("token_type must be 'header' or 'cookie'")
-        self.session.headers.update({"Accept": "application/json"})
-
-    def _url(self, path: str) -> str:
-        path = path.lstrip("/")
-        return f"{self.base_url}/{path}"
-
-    def get_product(self, product_id: str) -> Dict:
+        self.session.headers.update(self._get_headers())
+    
+    def _get_headers(self) -> Dict[str, str]:
+        """Формирование заголовков для запросов"""
+        headers = {
+            "Content-type": "application/json",
+            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+            "Accept": "application/json"
+        }
+        if self.token:
+            headers["Authorization"] = f"Bearer {self.token}"
+        return headers
+    
+    def _make_url(self, path: str) -> str:
+        """Формирование полного URL"""
+        return urljoin(self.base_url, path.lstrip('/'))
+    
+    @allure.step("API: Поиск продуктов по фразе: {phrase}")
+    def search_product(self, phrase: str, customer_city_id: int = 54, limit: int = 20) -> requests.Response:
         """
-        Получить карточку товара по id.
-        Пример: GET /products/{product_id}
+        Поиск продуктов по поисковой фразе
+        
+        Args:
+            phrase: Поисковый запрос
+            customer_city_id: ID города
+            limit: Количество результатов
+            
+        Returns:
+            Response объект
         """
-        url = self._url(f"products/{product_id}")
-        resp = self.session.get(url)
-        resp.raise_for_status()
-        return resp.json()
-
-    def search_products(self, query: str, limit: int = 20) -> List[Dict]:
+        params = {
+            "customerCityId": customer_city_id,
+            "phrase": phrase,
+            "limit": limit
+        }
+        
+        response = self.session.get(self.base_url, params=params)
+        
+        # Прикрепляем информацию к Allure
+        allure.attach(
+            f"URL: {response.url}\nStatus: {response.status_code}",
+            name="Request Info",
+            attachment_type=allure.attachment_type.TEXT
+        )
+        allure.attach(response.text, "Response Body", allure.attachment_type.JSON)
+        
+        return response
+    
+    @allure.step("API: Извлечение названий книг из ответа")
+    def extract_book_titles(self, response_json: Dict) -> List[str]:
         """
-        Поиск товаров по запросу.
-        Пример: GET /products/search?q=<query>&limit=<limit>
+        Извлечение названий книг из JSON ответа
+        
+        Args:
+            response_json: JSON ответ от API
+            
+        Returns:
+            Список названий книг
         """
-        url = self._url("products/search")
-        resp = self.session.get(url, params={"q": query, "limit": limit})
-        resp.raise_for_status()
-        data = resp.json()
-        # Ожидаем либо список товаров, либо словарь с ключом 'products'
-        if isinstance(data, list):
-            return data
-        if isinstance(data, dict):
-            return data.get("products", data.get("items", []))
-        return []
-
-    def add_to_cart(self, product_id: str, quantity: int = 1) -> Dict:
+        titles = []
+        
+        # Проверяем разные возможные структуры ответа
+        if 'included' in response_json:
+            # Формат: { "included": [ { "type": "product", "attributes": { "title": ... } } ] }
+            titles = [
+                item['attributes']['title'] 
+                for item in response_json.get('included', []) 
+                if item.get('type') == 'product' and 'attributes' in item
+            ]
+        elif 'data' in response_json:
+            # Формат: { "data": [ { "attributes": { "title": ... } } ] }
+            titles = [
+                item['attributes']['title'] 
+                for item in response_json.get('data', []) 
+                if 'attributes' in item
+            ]
+        elif isinstance(response_json, list):
+            # Формат: прямой список продуктов
+            titles = [
+                item.get('title') or item.get('attributes', {}).get('title')
+                for item in response_json
+                if item
+            ]
+        
+        # Фильтруем None значения
+        titles = [title for title in titles if title]
+        
+        allure.attach(
+            "\n".join([f"{i+1}. {title}" for i, title in enumerate(titles[:10])]),
+            name="Extracted Titles (first 10)",
+            attachment_type=allure.attachment_type.TEXT
+        )
+        
+        return titles
+    
+    @allure.step("API: Извлечение ID продуктов из ответа")
+    def extract_product_ids(self, response_json: Dict) -> List[str]:
         """
-        Добавить товар в корзину.
-        Пример: POST /cart/add с JSON {'product_id': ..., 'quantity': ...}
+        Извлечение ID продуктов из JSON ответа
+        
+        Args:
+            response_json: JSON ответ от API
+            
+        Returns:
+            Список ID продуктов
         """
-        url = self._url("cart/add")
-        body = {"product_id": product_id, "quantity": quantity}
-        resp = self.session.post(url, json=body)
-        resp.raise_for_status()
-        return resp.json()
-
-    def get_cart(self) -> Dict:
+        product_ids = []
+        
+        if 'included' in response_json:
+            product_ids = [
+                item['id'] 
+                for item in response_json.get('included', []) 
+                if item.get('type') == 'product'
+            ]
+        elif 'data' in response_json:
+            product_ids = [
+                item['id'] 
+                for item in response_json.get('data', [])
+            ]
+        
+        return product_ids
+    
+    @allure.step("API: Добавление товара в корзину")
+    def add_to_cart(self, product_id: str, quantity: int = 1) -> requests.Response:
         """
-        Получить текущее содержимое корзины.
-        Пример: GET /cart
+        Добавление товара в корзину через API
+        
+        Args:
+            product_id: ID товара
+            quantity: Количество
+            
+        Returns:
+            Response объект
         """
-        url = self._url("cart")
-        resp = self.session.get(url)
-        resp.raise_for_status()
-        return resp.json()
-
-    def remove_from_cart(self, item_id: str) -> Dict:
+        # Предполагаемый эндпоинт для добавления в корзину
+        cart_url = self._make_url("/web/api/v2/cart/add")
+        
+        payload = {
+            "productId": product_id,
+            "quantity": quantity
+        }
+        
+        response = self.session.post(cart_url, json=payload)
+        
+        allure.attach(
+            f"Product ID: {product_id}, Quantity: {quantity}",
+            name="Add to cart payload",
+            attachment_type=allure.attachment_type.TEXT
+        )
+        
+        return response
+    
+    @allure.step("API: Получение содержимого корзины")
+    def get_cart(self) -> requests.Response:
         """
-        Удалить позицию из корзины по id.
-        Пример: POST /cart/remove с JSON {'item_id': ...}
+        Получение содержимого корзины через API
+        
+        Returns:
+            Response объект
         """
-        url = self._url("cart/remove")
-        resp = self.session.post(url, json={"item_id": item_id})
-        resp.raise_for_status()
-        return resp.json()
+        cart_url = self._make_url("/web/api/v2/cart")
+        response = self.session.get(cart_url)
+        
+        allure.attach(response.text, "Cart Contents", allure.attachment_type.JSON)
+        
+        return response
+    
+    @allure.step("API: Очистка корзины")
+    def clear_cart(self) -> requests.Response:
+        """
+        Очистка корзины через API
+        
+        Returns:
+            Response объект
+        """
+        clear_url = self._make_url("/web/api/v2/cart/clear")
+        response = self.session.post(clear_url)
+        
+        return response
