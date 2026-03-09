@@ -1,7 +1,7 @@
 import sys
 import os
-import pytest
 import time
+import pytest
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
@@ -11,12 +11,20 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from configuration.configProvider import configProvider
 from testdata.DataProvider import DataProvider
 from page.MainPage import MainPage
+from api.ProductApi import ProductApi
 
 
 @pytest.fixture(scope="session")
 def config():
     return configProvider()
 
+@pytest.fixture
+def api_client():
+    base_url = os.environ.get("CHITAI_API_BASE_URL")
+    token = os.environ.get("CHITAI_API_TOKEN")
+    if not base_url or not token:
+        pytest.skip("CHITAI_API_BASE_URL или CHITAI_API_TOKEN не заданы - пропуск API тестов")
+    return ProductApi(base_url, token)
 
 @pytest.fixture
 def test_data():
@@ -64,23 +72,14 @@ def login_via_cookie(browser, test_data, config):
     Использует метод login_with_cookies из BasePage через MainPage.
     """
     main_page = MainPage(browser)
-    
-    # Получаем токены из test_data
-    refresh_token = test_data.get("refresh_token")
-    access_token = test_data.get("access_token")
-    
-    if refresh_token and access_token and refresh_token != "auth_token_cookie_name":
-        main_page.login_with_cookies(refresh_token=refresh_token, access_token=access_token)
-    else:
-        # Пробуем использовать переменные окружения
-        main_page.login_with_cookies()
-    
-    # Задержка для визуального контроля
-    wait_time = test_data.get("wait_after_actions")
-    if wait_time:
-        try:
-            time.sleep(float(wait_time))
-        except (ValueError, TypeError):
-            time.sleep(1)
-    
-    return main_page
+
+@pytest.fixture
+def cart_with_item(browser, login_via_cookie):
+    """
+    Фикстура: открываем главную страницу, добавляем в корзину первый товар
+    и возвращаем объект MainPage для дальнейших действий в тесте.
+    """
+    page = MainPage(browser)
+    page.go()  # открыть базовый URL
+    page.add_first_product_to_cart()  # добавить товар в корзину
+    return page

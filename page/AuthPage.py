@@ -1,4 +1,3 @@
-
 import allure
 import sys
 import os

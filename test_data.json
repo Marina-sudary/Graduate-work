@@ -1,11 +1,11 @@
 {
-  "telephone": "telephone",
+  "telephone": "+79381115365",
   "otp": "kod",
-  "first_name": "имя",
-  "last_name": "фамилия",
-  "email": "@mail.ru",
-  "refresh_token": "auth_token_cookie_name",
-  "access_token": "auth_token_value",
+  "first_name": "Марина",
+  "last_name": "Черныш",
+  "email": "risha1701@mail.ru",
+  "refresh_token": "s6XxAmXzMMkoQ40XJutFxfdeyZQNd1WacKSQlm3teLlsZTlfPkRV6JHxRlYsREVxER1HEfMhWRT2KNca",
+  "access_token": "Bearer%20eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJodHRwczovL3VzZXItcmlnaHQiLCJzdWIiOjI0Mjc4MDA3LCJpYXQiOjE3NzI2MjkwNzUsImV4cCI6MTc3MjYzMjY3NSwidHlwZSI6MjAsImp0aSI6IjAxOWNiOGVkLTI3MjItNzM3Mi05ZWE2LTcxYzgxYjIwM2QwOSIsInJvbGVzIjoxMH0.UZNlp5fkOrynynSkhEARXLZP9OvTyiG9WxkqKkabjQpGQCDBaSiUiUtmorV5FpYILB1Mj8l1F43uLTbzVWlwncd_GWOPenGBFbAGH7VRZhJZC4FffjAiJ1-JpCKBqVDdW6eLzSreFtXwrsyqB7TyWcY9EyyoY11R5FMwJqurdxezKQLfPOABtssmlJC2TySUKjvTb-v6KILqkT3_mz5FTbfPHl57zIvWaOOKbJUcbmUwwAtlKBVtJCBst0gMPbWpYECWPfeKAZfL9wrg7EIwjuGS0h9_YbG18MgAg_Wz4-7N02mDtBEkF_sgX77TpaGgVSE6wKFvrdrGZV0bFWoRJw",
   "search_phrase": "пушкин",
   "wait_after_actions": 1
 }
