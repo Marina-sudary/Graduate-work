@@ -8,7 +8,7 @@ def _load_config():
     if _config is None:
         config_path = os.environ.get(
             "CHITAI_CONFIG",
-            os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "test_config_ini")
+            os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "settings.ini")
         )
         parser = configparser.ConfigParser()
         if os.path.exists(config_path):

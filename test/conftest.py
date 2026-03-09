@@ -5,6 +5,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from configuration.configProvider import configProvider
 
 import pytest
+import requests
 import time
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service

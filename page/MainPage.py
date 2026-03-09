@@ -29,25 +29,32 @@ class MainPage:
         inp.send_keys(phrase)
         btn = self.wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, btn_sel)))
         btn.click()
-@allure.step("Добавить первый найденный товар в корзину")
-def add_first_product_to_cart(self):
-    selector = 'button[data-testid-button-mini-product-card="canBuy"]'
-    try:
-        # Ждем появления кнопок
-        btns = self.wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, selector)))
-        if not btns:
-            raise Exception("Кнопки 'Купить' не найдены")
-        
-        # Прокручиваем к кнопке
-        self.__driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", btns[0])
-        time.sleep(1)  # небольшая пауза после скролла
-        
-        # Пробуем кликнуть через JavaScript
-        self.__driver.execute_script("arguments[0].click();", btns[0])
-        
-    except Exception as e:
-        print(f"Ошибка при добавлении в корзину: {e}")
-        raise
+
+    @allure.step("Добавить первый найденный товар в корзину")
+    def add_first_product_to_cart(self):
+        selector = 'button[data-testid-button-mini-product-card="canBuy"]'
+        try:
+            wait = WebDriverWait(self.__driver, 5)
+
+        # Найти все кнопки "Купить"
+            btns = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, selector)))
+            if not btns:
+                raise Exception("Кнопки 'Купить' не найдены")
+
+        # Прокрутить к первой кнопке
+            first_btn = btns[0]
+            self.__driver.execute_script("arguments[0].scrollIntoView({block: 'center'});", first_btn)
+
+        # После прокрутки снова получить доступ к элементу и дождаться кликабельности
+        # Это помогает избежать ошибок из-за устаревшей ссылки на элемент после прокрутки
+            first_btn = wait.until(EC.presence_of_all_elements_located((By.CSS_SELECTOR, selector)))[0]
+            wait.until(EC.element_to_be_clickable((By.CSS_SELECTOR, selector)))
+
+        # Клик по кнопке
+            first_btn.click()
+        except Exception:
+        # Можно добавить логирование или повторную обработку ошибок здесь
+            raise
 
     @allure.step("Открыть корзину")
     def open_cart(self):

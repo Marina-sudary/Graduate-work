@@ -1,4 +1,5 @@
 import pytest
+import requests
 from page.MainPage import MainPage
 
 @pytest.mark.ui
@@ -11,10 +12,9 @@ def test_search_and_add_to_cart(browser, test_data, login_via_cookie):
     main.go()
     phrase = test_data.get("search_phrase") or "книга"
     main.search(phrase)
-    # добавим первый товар в корзину
+             # добавим первый товар в корзину
     main.add_first_product_to_cart()
-
-    # откроем корзину и проверим, что URL содержит /cart
+            # откроем корзину и проверим, что URL содержит /cart
     main.open_cart()
     assert "/cart" in browser.current_url or browser.current_url.endswith("/cart")
 
