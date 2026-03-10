@@ -1,6 +1,4 @@
 import allure
-import os
-from urllib.parse import unquote
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -37,47 +35,7 @@ class BasePage:
             attachment_type=allure.attachment_type.PNG
         )
     
-    @allure.step("Войти с использованием cookies")
-    def login_with_cookies(self, refresh_token: str = None, access_token: str = None):
-        """
-        Вход в систему через установку cookies
-        Токены можно передать напрямую или через переменные окружения:
-        - CHITAI_REFRESH_TOKEN
-        - CHITAI_ACCESS_TOKEN
-        """
-        if not refresh_token or not access_token:
-            refresh_token = refresh_token or os.environ.get("CHITAI_REFRESH_TOKEN")
-            access_token = access_token or os.environ.get("CHITAI_ACCESS_TOKEN")
 
-        if not refresh_token or not access_token:
-            raise ValueError("Tokens for login via cookies are not provided. Pass as args or set CHITAI_REFRESH_TOKEN and CHITAI_ACCESS_TOKEN.")
-
-        # Декодируем URL-encoded access token если нужно
-        access_token_decoded = unquote(access_token)
-
-        # Открываем домен и добавляем cookies
-        self.__driver.get(self.base_url)
-        self.__driver.delete_all_cookies()
-
-        cookies = [
-            {"name": "refresh-token", "value": refresh_token, "path": "/", "domain": "www.chitai-gorod.ru", "secure": True},
-            {"name": "access-token", "value": access_token_decoded, "path": "/", "domain": "www.chitai-gorod.ru", "secure": True},
-        ]
-
-        for cookie in cookies:
-            try:
-                self.__driver.add_cookie(cookie)
-            except Exception:
-                # Пробуем альтернативный домен
-                cookie_alt = dict(cookie)
-                cookie_alt["domain"] = ".chitai-gorod.ru"
-                try:
-                    self.__driver.add_cookie(cookie_alt)
-                except Exception as e:
-                    print(f"Не удалось установить cookie {cookie['name']}: {e}")
-
-        self.__driver.refresh()
-    
     @allure.step("Проверить наличие элемента")
     def is_element_present(self, by, selector: str, timeout: int = 5) -> bool:
         """Проверить, присутствует ли элемент на странице"""

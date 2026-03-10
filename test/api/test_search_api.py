@@ -1,13 +1,12 @@
 import allure
 import pytest
-import sys
-import os
 from api.ProductApi import ProductApi
+from configuration.configProvider import configProvider
 
-# Конфигурация
-BASE_URL = "https://web-agr.chitai-gorod.ru/web/api/v2/search/product"
-# Токен лучше брать из переменных окружения, а не хранить в коде!
-TOKEN = os.environ.get("CHITAI_API_TOKEN", "eyJhbGc...")  # Замените на реальный токен или установите переменную окружения
+config = configProvider()
+
+BASE_URL = config.get("api","base_url")
+TOKEN = config.get("api","token")
 
 
 @allure.epic("API тестирование сайта Читай-город")

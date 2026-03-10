@@ -1,6 +1,12 @@
 import os
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
+from configuration.configProvider import configProvider
+
+config = configProvider()
+
+BASE_URL = config.get("ui","base_url")
+
 
 class TestCartUI:
     def test_clear_cart_ui(self, browser, cart_with_item):
@@ -11,7 +17,7 @@ class TestCartUI:
         wait = WebDriverWait(browser, 15)
 
         try:
-            browser.get("https://www.chitai-gorod.ru/cart")
+            browser.get(BASE_URL)
             cart_with_item.delete_first_item_from_cart()
 
             # Ждем, пока корзина станет пустой

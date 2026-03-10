@@ -1,7 +1,7 @@
 import os
 import sys
 import allure
-import time
+from page.BasePage import BasePage
 from urllib.parse import unquote
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.common.by import By
@@ -11,11 +11,10 @@ from selenium.webdriver.support import expected_conditions as EC
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from configuration.configProvider import configProvider
 
-class MainPage:
+class MainPage(BasePage):
     def __init__(self, driver: WebDriver, timeout: int = 10) -> None:
-        self.__driver = driver
-        self.wait = WebDriverWait(driver, timeout)
-        self.base = configProvider().get("ui", "base_url").rstrip("/")
+        super().__init__(driver, timeout)
+        self.__url = self.base_url
 
     @allure.step("Открыть стартовую страницу")
     def go(self):

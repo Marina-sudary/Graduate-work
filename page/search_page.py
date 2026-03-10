@@ -1,21 +1,18 @@
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.support import expected_conditions as EC
 import allure
+from page.BasePage import BasePage
 
 
-class SearchPage:
-    def __init__(self, driver):
-        """Инициализация класса SearchPage с драйвером и временем ожидания
-        Args: driver(WebDriver): драйвер Selenium для управления браузером"""
-        self.driver = driver
-        self.wait = WebDriverWait(driver, 20)
+class SearchPage(BasePage):
+    def __init__(self, driver: WebDriver, timeout: int = 10) -> None:
+        super().__init__(driver, timeout)
+        self.__url = self.base_url
 
-    @allure.step("Открытие URL")
-    def open(self, url):
-        """Открыть указанную url в браузере
-                Args: url(str): url адрес для открытия"""
-        self.driver.get(url)
+    @allure.step("Открыть стартовую страницу")
+    def go(self):
+        self.__driver.get(self.__url)
 
     @allure.step("Ввод поискового запроса '{query}'")
     def enter_search_query(self, query):

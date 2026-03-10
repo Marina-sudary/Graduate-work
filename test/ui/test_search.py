@@ -1,13 +1,16 @@
 import sys
 import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-
 import pytest
 from selenium import webdriver
 import allure
 from page.search_page import SearchPage
-
 from time import sleep
+from configuration.configProvider import configProvider
+
+config = configProvider()
+
+BASE_URL = config.get("ui","base_url")
 
 
 @pytest.fixture(scope="session")
@@ -21,7 +24,7 @@ def driver():
 @pytest.fixture
 def search_page(driver):
     page = SearchPage(driver)
-    page.open("https://www.chitai-gorod.ru/")
+    page.open(BASE_URL)
     sleep(5)
     return page
 

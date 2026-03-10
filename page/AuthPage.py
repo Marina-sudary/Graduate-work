@@ -8,14 +8,15 @@ from selenium.webdriver.support import expected_conditions as EC
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from page.BasePage import BasePage
 
-class MainPage(BasePage):
+class AuthPage(BasePage):
     def __init__(self, driver: WebDriver, timeout: int = 10) -> None:
         super().__init__(driver, timeout)
-        # Метод login_with_cookies уже унаследован от BasePage!
+        self.__url = self.base_url
+
 
     @allure.step("Открыть стартовую страницу")
     def go(self):
-        self.open()  # Используем метод из BasePage
+        self.open()
 
     @allure.step("Поиск и ввод фразы: {phrase}")
     def search(self, phrase: str):
