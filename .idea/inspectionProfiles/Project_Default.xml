@@ -1,0 +1,55 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredPackages">
+        <list>
+          <option value="allure-pytest" />
+          <option value="allure-python-commons" />
+          <option value="attrs" />
+          <option value="autopep8" />
+          <option value="black" />
+          <option value="certifi" />
+          <option value="cffi" />
+          <option value="charset-normalizer" />
+          <option value="click" />
+          <option value="colorama" />
+          <option value="flake8" />
+          <option value="greenlet" />
+          <option value="h11" />
+          <option value="idna" />
+          <option value="iniconfig" />
+          <option value="mccabe" />
+          <option value="mypy_extensions" />
+          <option value="outcome" />
+          <option value="package_name" />
+          <option value="packaging" />
+          <option value="pathspec" />
+          <option value="platformdirs" />
+          <option value="pluggy" />
+          <option value="psycopg2-binary" />
+          <option value="pycodestyle" />
+          <option value="pycparser" />
+          <option value="pyflakes" />
+          <option value="Pygments" />
+          <option value="PySocks" />
+          <option value="pytest" />
+          <option value="python-dotenv" />
+          <option value="pytokens" />
+          <option value="requests" />
+          <option value="selenium" />
+          <option value="sniffio" />
+          <option value="sortedcontainers" />
+          <option value="SQLAlchemy" />
+          <option value="trio" />
+          <option value="trio-websocket" />
+          <option value="typing_extensions" />
+          <option value="urllib3" />
+          <option value="webdriver-manager" />
+          <option value="websocket-client" />
+          <option value="wsproto" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>
