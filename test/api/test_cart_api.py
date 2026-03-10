@@ -1,6 +1,7 @@
 import allure
 import pytest
 import os
+import sys
 from api.ProductApi import ProductApi
 
 BASE_URL = "https://web-agr.chitai-gorod.ru/web/api/v2"

@@ -1,5 +1,6 @@
 import allure
 import pytest
+import sys
 import os
 from api.ProductApi import ProductApi
 
