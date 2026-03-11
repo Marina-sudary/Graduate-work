@@ -22,7 +22,7 @@ def pytest_addoption(parser):
 def pytest_collection_modifyitems(config, items):
     """Модификация сбора тестов в зависимости от режима."""
     run_mode = config.getoption("--mode")
-    
+
     if run_mode == "ui":
         skip_api = pytest.mark.skip(reason="Запущен только UI режим")
         for item in items:
@@ -49,21 +49,21 @@ def driver() -> Generator[webdriver.Chrome, None, None]:
         chrome_options.add_argument("--disable-gpu")
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
-        
+
         service = Service(ChromeDriverManager().install())
         driver = webdriver.Chrome(service=service, options=chrome_options)
         driver.implicitly_wait(Settings.DEFAULT_TIMEOUT)
         driver.set_page_load_timeout(Settings.PAGE_LOAD_TIMEOUT)
-        
+
         # Открываем сайт один раз для всех тестов
         with allure.step("Открыть главную страницу"):
             driver.get(Settings.BASE_URL)
             WebDriverWait(driver, Settings.PAGE_LOAD_TIMEOUT).until(
                 lambda d: d.execute_script("return document.readyState") == "complete"
             )
-        
+
         yield driver
-        
+
         with allure.step("Закрытие веб-драйвера"):
             driver.quit()
 
@@ -72,7 +72,6 @@ def driver() -> Generator[webdriver.Chrome, None, None]:
 def api_client() -> ChitaiGorodAPI:
     """
     Фикстура для создания API клиента.
-    
     Returns:
         ChitaiGorodAPI: Экземпляр API клиента
     """

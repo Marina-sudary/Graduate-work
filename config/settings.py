@@ -1,21 +1,20 @@
-import os
 from enum import Enum
 
 
 class Settings:
     """Класс с настройками для тестов."""
-    
+
     # URL
     BASE_URL = "https://www.chitai-gorod.ru"
-    
+
     # Тестовые данные
     SEARCH_QUERY = "Солнце"
     SORT_OPTION = "Сначала дешевые"
-    
+
     # Таймауты (в секундах)
     DEFAULT_TIMEOUT = 10
     PAGE_LOAD_TIMEOUT = 30
-    
+
     # Режимы запуска
     class RunMode(str, Enum):
         UI = "ui"
@@ -25,7 +24,7 @@ class Settings:
 
 class TestData:
     """Тестовые данные."""
-    
+
     SEARCH_TERMS = [
         "Солнце",
         "Java",
@@ -38,7 +37,7 @@ class TestData:
         "фэнтези",
         "наука"
     ]
-    
+
     SPECIAL_SEARCH_TERMS = [
         "C++",
         "C#",
@@ -46,14 +45,14 @@ class TestData:
         "PHP",
         "JavaScript"
     ]
-    
+
     SORTING_OPTIONS = [
         "По популярности",
         "Сначала дешевые",
         "Сначала дорогие",
         "По новизне"
     ]
-    
+
     BOOK_CATEGORIES = [
         "программирование",
         "роман",
