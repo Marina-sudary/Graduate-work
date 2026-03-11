@@ -6,7 +6,8 @@
 
 1. Склонировать проект `git clone https://github.com/Marina-sudary/Diplom`.
 2. Установить зависимости `pip install > -r requirements.txt`.
-3. Запустить тесты `pytest`.
+3. Запустить тесты `pytest`:
+    - при авторизации вписать телефон и полученный из смс код.
 4. Сгенерировать отчет `allure generate allure-files -o allure-report`.
 5. Открыть отчет `allure open allure-report`.
 

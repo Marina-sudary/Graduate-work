@@ -1,0 +1,2 @@
+[32mINFO    [0m api.client:client.py:64 Поиск по URL: https://www.chitai-gorod.ru/search с параметрами: {'phrase': 'Java'}
+[32mINFO    [0m api.client:client.py:130 Найдено продуктов: 0

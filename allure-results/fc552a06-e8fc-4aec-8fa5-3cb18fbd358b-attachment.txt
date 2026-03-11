@@ -1,0 +1,10 @@
+INFO:api.client:Поиск по URL: https://www.chitai-gorod.ru/search с параметрами: {'phrase': 'программирование'}
+INFO:api.client:Найдено продуктов: 0
+INFO:api.client:Поиск по URL: https://www.chitai-gorod.ru/search с параметрами: {'phrase': 'роман'}
+INFO:api.client:Найдено продуктов: 0
+INFO:api.client:Поиск по URL: https://www.chitai-gorod.ru/search с параметрами: {'phrase': 'детектив'}
+INFO:api.client:Найдено продуктов: 0
+INFO:api.client:Поиск по URL: https://www.chitai-gorod.ru/search с параметрами: {'phrase': 'фэнтези'}
+INFO:api.client:Найдено продуктов: 0
+INFO:api.client:Поиск по URL: https://www.chitai-gorod.ru/search с параметрами: {'phrase': 'наука'}
+INFO:api.client:Найдено продуктов: 0
