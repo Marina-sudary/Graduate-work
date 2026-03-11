@@ -1,9 +1,11 @@
 {
-  "telephone": "+79381115365",
-  "otp": "kod",
-  "first_name": "Марина",
-  "last_name": "Черныш",
-  "email": "risha1701@mail.ru",
+  "telephone": "телефон",
+  "otp": "код",
+  "first_name": "имя",
+  "last_name": "фамилия",
+  "email": "@mail.ru",
+  "auth_token_cookie_name": "ctg_auth_token",
+  "auth_token_value": "token_value",
   "search_phrase": "пушкин",
   "wait_after_actions": 1
 }

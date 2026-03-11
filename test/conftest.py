@@ -1,85 +1,84 @@
-import sys
-import os
-import time
 import pytest
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
 from webdriver_manager.chrome import ChromeDriverManager
+from typing import Generator
+import allure
+from config.settings import Settings
+from api.client import ChitaiGorodAPI
 
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from configuration.configProvider import configProvider
-from testdata.DataProvider import DataProvider
-from page.MainPage import MainPage
-from api.ProductApi import ProductApi
+def pytest_addoption(parser):
+    """Добавление командной строки опций."""
+    parser.addoption(
+        "--mode",
+        action="store",
+        default="all",
+        help="Режим запуска тестов: ui, api, all"
+    )
+
+
+def pytest_collection_modifyitems(config, items):
+    """Модификация сбора тестов в зависимости от режима."""
+    run_mode = config.getoption("--mode")
+    
+    if run_mode == "ui":
+        skip_api = pytest.mark.skip(reason="Запущен только UI режим")
+        for item in items:
+            if "api" in item.keywords:
+                item.add_marker(skip_api)
+    elif run_mode == "api":
+        skip_ui = pytest.mark.skip(reason="Запущен только API режим")
+        for item in items:
+            if "ui" in item.keywords:
+                item.add_marker(skip_ui)
+
+
+@pytest.fixture(scope="class")
+def driver() -> Generator[webdriver.Chrome, None, None]:
+    """
+    Фикстура для создания и закрытия веб-драйвера.
+    scope="class" - драйвер создается один раз для всего класса тестов.
+    """
+    with allure.step("Инициализация веб-драйвера"):
+        chrome_options = Options()
+        chrome_options.add_argument("--window-size=1920,1080")
+        chrome_options.add_argument("--disable-notifications")
+        chrome_options.add_argument("--disable-popup-blocking")
+        chrome_options.add_argument("--disable-gpu")
+        chrome_options.add_argument("--no-sandbox")
+        chrome_options.add_argument("--disable-dev-shm-usage")
+        
+        service = Service(ChromeDriverManager().install())
+        driver = webdriver.Chrome(service=service, options=chrome_options)
+        driver.implicitly_wait(Settings.DEFAULT_TIMEOUT)
+        driver.set_page_load_timeout(Settings.PAGE_LOAD_TIMEOUT)
+        
+        # Открываем сайт один раз для всех тестов
+        with allure.step("Открыть главную страницу"):
+            driver.get(Settings.BASE_URL)
+            WebDriverWait(driver, Settings.PAGE_LOAD_TIMEOUT).until(
+                lambda d: d.execute_script("return document.readyState") == "complete"
+            )
+        
+        yield driver
+        
+        with allure.step("Закрытие веб-драйвера"):
+            driver.quit()
 
 
 @pytest.fixture(scope="session")
-def config():
-    return configProvider()
-
-@pytest.fixture
-def api_client():
-    base_url = os.environ.get("CHITAI_API_BASE_URL")
-    token = os.environ.get("CHITAI_API_TOKEN")
-    if not base_url or not token:
-        pytest.skip("CHITAI_API_BASE_URL или CHITAI_API_TOKEN не заданы - пропуск API тестов")
-    return ProductApi(base_url, token)
-
-@pytest.fixture
-def test_data():
-    return DataProvider()
-
-
-@pytest.fixture(scope="function")
-def driver(config):
-    """Фикстура для WebDriver"""
-    timeout = int(config.get("ui", "timeout", "30"))
-    browser_name = config.get("ui", "browser_name", "chrome")
-    
-    if browser_name == "chrome":
-        options = webdriver.ChromeOptions()
-        # options.add_argument("--headless=new")  # раскомментируйте для headless
-        options.add_argument("--window-size=1920,1080")
-        options.add_argument("--disable-notifications")
-        options.add_argument("--disable-popup-blocking")
-        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-    else:
-        raise NotImplementedError("Only chrome is supported in this skeleton")
-
-    driver.implicitly_wait(timeout)
-    driver.maximize_window()
-    
-    yield driver
-    
-    # Делаем скриншот при падении теста
-    if hasattr(driver, "_current_failure"):
-        driver.save_screenshot("failure.png")
-    
-    driver.quit()
-
-
-@pytest.fixture
-def browser(driver):
-    """Алиас для driver, для обратной совместимости"""
-    return driver
-
-
-@pytest.fixture
-def login_via_cookie(browser, test_data, config):
+def api_client() -> ChitaiGorodAPI:
     """
-    Фикстура для входа через cookies.
-    Использует метод login_with_cookies из BasePage через MainPage.
+    Фикстура для создания API клиента.
+    
+    Returns:
+        ChitaiGorodAPI: Экземпляр API клиента
     """
-    main_page = MainPage(browser)
+    with allure.step("Инициализация API клиента"):
+        return ChitaiGorodAPI()
 
-@pytest.fixture
-def cart_with_item(browser, login_via_cookie):
-    """
-    Фикстура: открываем главную страницу, добавляем в корзину первый товар
-    и возвращаем объект MainPage для дальнейших действий в тесте.
-    """
-    page = MainPage(browser)
-    page.go()  # открыть базовый URL
-    page.add_first_product_to_cart()  # добавить товар в корзину
-    return page
+
+# Добавляем WebDriverWait для использования в тестах
+from selenium.webdriver.support.ui import WebDriverWait

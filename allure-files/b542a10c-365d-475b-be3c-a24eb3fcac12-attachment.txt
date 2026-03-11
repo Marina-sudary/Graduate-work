@@ -1,2 +1,0 @@
-URL: https://web-agr.chitai-gorod.ru/web/api/v2/search/product?customerCityId=54&phrase=%D0%9F%D1%83%D1%88%D0%BA%D0%B8%D0%BD&limit=20
-Status: 401
