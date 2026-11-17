@@ -1,11 +1,11 @@
 {
-  "telephone": "telephone",
-  "otp": "kod",
+  "telephone": "телефон",
+  "otp": "код",
   "first_name": "имя",
   "last_name": "фамилия",
   "email": "@mail.ru",
-  "refresh_token": "auth_token_cookie_name",
-  "access_token": "auth_token_value",
+  "auth_token_cookie_name": "ctg_auth_token",
+  "auth_token_value": "token_value",
   "search_phrase": "пушкин",
   "wait_after_actions": 1
 }
